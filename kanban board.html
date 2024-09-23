@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fef7ef;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #ffedd5;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 0;
+    }
+
+    .logout-btn {
+      padding: 10px 20px;
+      background-color: #ff7355;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .kanban-column {
+      background-color: #fff7e6;
+      border: 2px solid #e8b9a8;
+      border-radius: 8px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .kanban-column h2 {
+      text-align: center;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      background-color: white;
+      border: 2px solid black;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .kanban-card {
+      background-color: #f4d6cc;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #ffedd5;
+      font-size: 1em;
+    }
+
+  </style>
+  <title>Kanban Board</title>
+</head>
+<body>
+
+  <header>
+    <h1>Kanban Board</h1>
+    <button class="logout-btn">Log Out</button>
+    <a href="kanban_form.html"><button class="logout-btn">Add Task</button></a>
+  </header>
+
+  <div class="kanban-board">
+    <div class="kanban-column">
+      <h2>Start</h2>
+
+    </div>
+    <div class="kanban-column">
+      <h2>Research</h2>
+
+    </div>
+    <div class="kanban-column">
+      <h2>Analysis</h2>
+
+    </div>
+    <div class="kanban-column">
+      <h2>Final</h2>
+    </div>
+    <div class="kanban-column">
+      <h2>Done</h2>
+    </div>
+  </div>
+  <script>
+    // Function to find the column by its heading text
+    function findColumnByHeadingText(text) {
+      const headers = document.querySelectorAll('.kanban-column h2'); // Get all column headers
+      for (let i = 0; i < headers.length; i++) {
+        if (headers[i].textContent.trim() === text) {
+          return headers[i].parentNode; // Return the parent (the whole column)
+        }
+      }
+      return null; // Return null if no match found
+    }
+  
+    // Object to map each column name to its corresponding DOM element on the Kanban board
+    const columns = {
+      start: findColumnByHeadingText("Start"),
+      research: findColumnByHeadingText("Research"),
+      analysis: findColumnByHeadingText("Analysis"),
+      final: findColumnByHeadingText("Final"),
+      done: findColumnByHeadingText("Done")
+    };
+  
+    // Function to create a new task card with a delete button
+    function createTaskCard(taskDescription, column) {
+      const newTaskCard = document.createElement('div');
+      newTaskCard.classList.add('kanban-card');
+      newTaskCard.textContent = taskDescription;
+  
+      // Create the delete button
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.style.marginLeft = '20px'; // Add some space between the task and the button
+      deleteButton.style.backgroundColor = '#ff4a33'; // Style the button
+      deleteButton.style.color = '#fff';
+      deleteButton.style.border = 'none';
+      deleteButton.style.padding = '5px 10px';
+      deleteButton.style.cursor = 'pointer';
+      deleteButton.style.borderRadius = '5px';
+  
+      // Append the delete button to the task card
+      newTaskCard.appendChild(deleteButton);
+  
+      // Add click event listener to the delete button
+      deleteButton.addEventListener('click', function() {
+        // Remove task from DOM
+        newTaskCard.remove();
+  
+        // Update localStorage to remove the task from the corresponding column
+        let tasks = JSON.parse(localStorage.getItem('kanbanTasks')) || {};
+        tasks[column] = tasks[column].filter(task => task !== taskDescription); // Remove the task from the array
+        localStorage.setItem('kanbanTasks', JSON.stringify(tasks)); // Save the updated tasks to localStorage
+      });
+  
+      return newTaskCard;
+    }
+  
+    // When the page loads, fetch tasks from localStorage and display them in the correct columns
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load tasks from localStorage
+      const tasks = JSON.parse(localStorage.getItem('kanbanTasks')) || {};
+  
+      // Iterate over each column and append the tasks
+      for (const column in tasks) {
+        if (tasks[column] && columns[column]) {
+          tasks[column].forEach(taskDescription => {
+            const newTaskCard = createTaskCard(taskDescription, column); // Create task card with delete button
+            columns[column].appendChild(newTaskCard);
+          });
+        }
+      }
+    });
+  </script>
+  <footer>
+    Made by Uliana with AI assistance
+  </footer>
+
+</body>
+</html>
